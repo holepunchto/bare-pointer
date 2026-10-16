@@ -6,7 +6,8 @@ const GestureDrag = require('bare-gtk/gesture-drag')
 let window = null
 let frames = null
 
-exports.tolerance = 0
+// GTK reports event coordinates as single precision floats.
+exports.tolerance = 0.001
 
 exports.mount = async function mount(t) {
   if (window === null) {
