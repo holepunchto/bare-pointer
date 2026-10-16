@@ -1,0 +1,45 @@
+name: Integrate
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    name: Security
+    steps:
+      - uses: holepunchto/actions/security-base@v1
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - uses: holepunchto/actions/node-base@v1
+      - run: npm run lint
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: macos-latest
+            platform: darwin
+          - os: macos-latest
+            platform: ios
+            tags: -simulator
+          - os: windows-latest
+            platform: win32
+    runs-on: ${{ matrix.os }}
+    name: Test / ${{ matrix.platform }}${{ matrix.tags }}
+    steps:
+      - uses: holepunchto/actions/bare-base@v1
+      - uses: holepunchto/actions/setup-gtk@v1
+      - if: matrix.platform == 'linux'
+        run: sudo apt update && sudo apt install -y libxtst6
+      - uses: holepunchto/actions/setup-windows-app-runtime@v1
+      - run: npm test -- --platform ${{ matrix.platform }}
