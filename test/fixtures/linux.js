@@ -31,6 +31,25 @@ exports.mount = async function mount(t) {
   return root
 }
 
+exports.popup = async function popup(t) {
+  const window = new Window()
+  const root = new FrameFixed()
+
+  window.defaultSize = [400, 300]
+  window.child = root
+  window.visible = true
+
+  const hide = () => {
+    window.visible = false
+  }
+
+  t.teardown(hide)
+
+  await new AnimationFrameProvider(window).afterAnimationFrame()
+
+  return { root, hide }
+}
+
 function place(root, child, frame) {
   child.insertBefore(root)
 
@@ -38,7 +57,7 @@ function place(root, child, frame) {
 }
 
 // A drag reports where it started, and how far it has come since.
-exports.box = async function box(root, x, y, width, height) {
+exports.box = async function box(root, x, y, width, height, onup) {
   const box = new FrameFixed()
   const drag = new GestureDrag()
   const events = []
@@ -54,7 +73,11 @@ exports.box = async function box(root, x, y, width, height) {
   })
 
   drag.on('dragUpdate', (dx, dy) => events.push(['move', startX + dx, startY + dy]))
-  drag.on('dragEnd', (dx, dy) => events.push(['up', startX + dx, startY + dy]))
+  drag.on('dragEnd', (dx, dy) => {
+    events.push(['up', startX + dx, startY + dy])
+
+    if (onup) onup()
+  })
 
   box.addController(drag)
 

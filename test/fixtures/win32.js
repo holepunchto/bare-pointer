@@ -27,8 +27,33 @@ exports.mount = async function mount(t) {
   return root
 }
 
+// A window can be closed but not hidden.
+exports.popup = async function popup(t) {
+  const window = new Window()
+  const root = new Canvas()
+
+  window.resizeClient(400, 300)
+  window.content = root
+  window.activate()
+
+  let closed = false
+
+  const hide = () => {
+    if (closed) return
+
+    closed = true
+    window.close()
+  }
+
+  t.teardown(hide)
+
+  await afterAnimationFrame()
+
+  return { root, hide }
+}
+
 // A panel without a background is not hit tested.
-exports.box = async function box(root, x, y, width, height) {
+exports.box = async function box(root, x, y, width, height, onup) {
   const box = new Canvas()
   const events = []
 
@@ -36,11 +61,23 @@ exports.box = async function box(root, x, y, width, height) {
   box.width = width
   box.height = height
 
-  box.on('pointerPressed', ({ x, y }) => events.push(['down', x, y]))
+  // Handled, as by an element that responds to a press. One nobody handled
+  // can leave windows opened later without pointer input.
+  box.on('pointerPressed', (event) => {
+    events.push(['down', event.x, event.y])
+
+    event.handled = true
+  })
   box.on('pointerMoved', ({ x, y, isInContact }) => {
     if (isInContact) events.push(['move', x, y])
   })
-  box.on('pointerReleased', ({ x, y }) => events.push(['up', x, y]))
+  box.on('pointerReleased', (event) => {
+    events.push(['up', event.x, event.y])
+
+    event.handled = true
+
+    if (onup) onup()
+  })
 
   Canvas.setLeft(box, x)
   Canvas.setTop(box, y)

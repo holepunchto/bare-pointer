@@ -112,3 +112,47 @@ test('is down only once at a time', async (t) => {
 
   await pointer.up()
 })
+
+// iOS and Android have a single window.
+const windows = { skip: fixture.popup === undefined }
+
+test('presses a view in a window shown after another was hidden', windows, async (t) => {
+  const { pointer } = await setup(t)
+
+  const first = await fixture.popup(t)
+  const before = await fixture.box(first.root, 40, 30, 100, 80)
+
+  await pointer.tap(before.view)
+
+  first.hide()
+
+  const second = await fixture.popup(t)
+  const after = await fixture.box(second.root, 40, 30, 100, 80)
+
+  await pointer.tap(after.view)
+
+  t.deepStrictEqual(
+    before.events.map(([name]) => name),
+    ['down', 'up'],
+    'the first window'
+  )
+  t.deepStrictEqual(
+    after.events.map(([name]) => name),
+    ['down', 'up'],
+    'the second window'
+  )
+})
+
+test('is not held up by a press that hides its window', windows, async (t) => {
+  const { pointer } = await setup(t)
+
+  const popup = await fixture.popup(t)
+  const { view, events } = await fixture.box(popup.root, 40, 30, 100, 80, popup.hide)
+
+  await pointer.tap(view)
+
+  t.deepStrictEqual(
+    events.map(([name]) => name),
+    ['down', 'up']
+  )
+})
