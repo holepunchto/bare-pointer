@@ -51,13 +51,13 @@
     "bare-app-kit": "^0.3.1",
     "bare-ndk": "^0.3.4",
     "bare-ui-kit-touch": "^0.1.0",
-    "bare-user32": "^0.1.0",
+    "bare-user32": "^0.1.1",
     "bare-win-ui": "^0.3.7",
     "bare-x11": "^0.1.0",
     "bare-x11-xtest": "^0.1.0"
   },
   "devDependencies": {
-    "bare-gtk": "^0.4.1",
+    "bare-gtk": "^0.4.2",
     "bare-native-test": "^0.1.3",
     "bare-tap": "^1.1.0",
     "bare-ui-kit": "^0.3.1",
