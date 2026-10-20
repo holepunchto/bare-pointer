@@ -61,12 +61,20 @@ exports.box = async function box(root, x, y, width, height, onup) {
   box.width = width
   box.height = height
 
-  box.on('pointerPressed', ({ x, y }) => events.push(['down', x, y]))
+  // Handled, as by an element that responds to a press. One nobody handled
+  // can leave windows opened later without pointer input.
+  box.on('pointerPressed', (event) => {
+    events.push(['down', event.x, event.y])
+
+    event.handled = true
+  })
   box.on('pointerMoved', ({ x, y, isInContact }) => {
     if (isInContact) events.push(['move', x, y])
   })
-  box.on('pointerReleased', ({ x, y }) => {
-    events.push(['up', x, y])
+  box.on('pointerReleased', (event) => {
+    events.push(['up', event.x, event.y])
+
+    event.handled = true
 
     if (onup) onup()
   })
