@@ -1,6 +1,6 @@
 {
   "name": "bare-pointer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Simulated pointer input for testing Bare apps",
   "exports": {
     "./package": "./package.json",
