@@ -27,8 +27,33 @@ exports.mount = async function mount(t) {
   return root
 }
 
+// A window can be closed but not hidden.
+exports.popup = async function popup(t) {
+  const window = new Window()
+  const root = new Canvas()
+
+  window.resizeClient(400, 300)
+  window.content = root
+  window.activate()
+
+  let closed = false
+
+  const hide = () => {
+    if (closed) return
+
+    closed = true
+    window.close()
+  }
+
+  t.teardown(hide)
+
+  await afterAnimationFrame()
+
+  return { root, hide }
+}
+
 // A panel without a background is not hit tested.
-exports.box = async function box(root, x, y, width, height) {
+exports.box = async function box(root, x, y, width, height, onup) {
   const box = new Canvas()
   const events = []
 
@@ -40,7 +65,11 @@ exports.box = async function box(root, x, y, width, height) {
   box.on('pointerMoved', ({ x, y, isInContact }) => {
     if (isInContact) events.push(['move', x, y])
   })
-  box.on('pointerReleased', ({ x, y }) => events.push(['up', x, y]))
+  box.on('pointerReleased', ({ x, y }) => {
+    events.push(['up', x, y])
+
+    if (onup) onup()
+  })
 
   Canvas.setLeft(box, x)
   Canvas.setTop(box, y)

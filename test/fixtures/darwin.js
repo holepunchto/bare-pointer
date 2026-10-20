@@ -34,13 +34,32 @@ exports.mount = async function mount(t) {
   return root
 }
 
-exports.box = async function box(root, x, y, width, height) {
+// Titled, so that it can become key as the windows of an application can.
+exports.popup = async function popup(t) {
+  const window = new Window({ width: 400, height: 300, styleMask: Window.STYLE_MASK.TITLED })
+  const root = view({ width: 400, height: 300 })
+
+  window.contentView = root
+  window.makeKeyAndOrderFront()
+
+  t.teardown(() => window.close())
+
+  await afterAnimationFrame()
+
+  return { root, hide: () => window.orderOut() }
+}
+
+exports.box = async function box(root, x, y, width, height, onup) {
   const box = view({ x, y, width, height })
   const events = []
 
   box.on('mouseDown', ({ x, y }) => events.push(['down', x, y]))
   box.on('mouseDragged', ({ x, y }) => events.push(['move', x, y]))
-  box.on('mouseUp', ({ x, y }) => events.push(['up', x, y]))
+  box.on('mouseUp', ({ x, y }) => {
+    events.push(['up', x, y])
+
+    if (onup) onup()
+  })
 
   root.addSubview(box)
 
