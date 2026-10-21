@@ -52,6 +52,15 @@ module.exports = class Pointer {
 
     if (this._backend.tap) {
       this._backend.tap(view, ...point)
+
+      // A tap can be posted to an event queue rather than delivered at once.
+      if (this._backend.pending !== undefined) {
+        for (let frames = 0; this._backend.pending(view); frames++) {
+          if (frames === 60) throw new Error('The tap was not delivered')
+
+          await this._frame(view)
+        }
+      }
     } else {
       this._backend.down(view, ...point)
 
