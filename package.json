@@ -49,6 +49,7 @@
   "dependencies": {
     "bare-animation-frame": "^0.1.1",
     "bare-app-kit": "^0.3.3",
+    "bare-foundation": "^0.1.1",
     "bare-ndk": "^0.3.4",
     "bare-ui-kit-touch": "^0.1.0",
     "bare-user32": "^0.1.1",
