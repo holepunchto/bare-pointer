@@ -39,7 +39,5 @@ jobs:
     steps:
       - uses: holepunchto/actions/bare-base@v1
       - uses: holepunchto/actions/setup-gtk@v1
-      - if: matrix.platform == 'linux'
-        run: sudo apt update && sudo apt install -y libxtst6
       - uses: holepunchto/actions/setup-windows-app-runtime@v1
       - run: npm test -- --platform ${{ matrix.platform }}
