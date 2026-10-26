@@ -54,7 +54,7 @@
     "bare-ui-kit-touch": "^0.1.0",
     "bare-user32": "^0.1.1",
     "bare-win-ui": "^0.3.7",
-    "bare-x11": "^0.1.0",
+    "bare-x11": "^0.1.1",
     "bare-x11-xtest": "^0.1.0"
   },
   "devDependencies": {

@@ -143,6 +143,20 @@ test('presses a view in a window shown after another was hidden', windows, async
   )
 })
 
+test('presses a view in a window behind another', windows, async (t) => {
+  const { root, pointer } = await setup(t)
+  const { view, events } = await fixture.box(root, 40, 30, 100, 80)
+
+  await fixture.popup(t)
+
+  await pointer.tap(view)
+
+  t.deepStrictEqual(
+    events.map(([name]) => name),
+    ['down', 'up']
+  )
+})
+
 test('is not held up by a press that hides its window', windows, async (t) => {
   const { pointer } = await setup(t)
 
